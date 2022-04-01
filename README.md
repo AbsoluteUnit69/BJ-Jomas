@@ -1,3 +1,3 @@
 # BJ-Jomas
-Game Jam
+Game Jam, slam, wham, bam
 Smash and Stash
