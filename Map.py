@@ -1,4 +1,5 @@
 import pygame
+from Button import Button
 '''
 Conrtols:
 r for rectangle mode:
@@ -12,21 +13,25 @@ control z will undo the last block placed in the mode you are in
 
 '''
 class Block(pygame.sprite.Sprite):
-    def __init__(self, color, width, height, position):
+    def __init__(self, color, width, height, position, time):
        pygame.sprite.Sprite.__init__(self)
        self.image = pygame.Surface([width, height])
        self.image.fill(color)
        self.rect = self.image.get_rect()
        self.rect.topleft = position
+       self.time = time
     
     def display(self, screen):
         screen.blit(self.image, (self.rect.topleft))
 
+    def display_grey(self, screen):
+        pygame.draw.rect(screen, (120, 120, 120, 50), self.rect)
+        
 class Map_maker():
     def __init__(self):
         self.screen = pygame.display
         self.screen_rect = self.screen.set_mode((960, 540))
-        self.blocks = []
+        self.time_blocks = {}
         self.points = []
         for row in range(0, 960, 12):
             for column in range(0, 540, 12):
@@ -39,6 +44,7 @@ class Map_maker():
             self.line_pos_x.append((0, i))
         self.mode = "rect"
         self.interactables = []
+        self.time_buttons = [Button(0, 0, 32, 32,(50, 100, 120), (50, 50, 50), self.screen_rect, 0)]
         self.start_loop()
 
     def get_closest(self, pos):
@@ -54,12 +60,17 @@ class Map_maker():
         run = True
         self.pos1 = None
         undo = False
+        selected_time = 0
         while run:
 
             self.screen_rect.fill((100, 100, 100))
-
-            for b in self.blocks:
-                b.display(self.screen_rect)
+            for time in self.time_blocks.keys():
+                if time == selected_time:
+                    for block in self.time_blocks[time]:
+                        block.display(self.screen_rect)
+                elif time == (selected_time - 1):
+                    for block in self.time_blocks[time]:
+                        block.display_grey(self.screen_rect)
 
             for i in self.interactables:
                 i.display(self.screen_rect)
@@ -73,25 +84,42 @@ class Map_maker():
                 if event.type == pygame.MOUSEBUTTONUP:
                     if self.mode == "rect":
                         if width*height > 100:
-                            self.blocks.append(Block((128, 0, 0), width, height, top_left))
+                            if selected_time in self.time_blocks.keys():
+                                self.time_blocks[selected_time].append(Block((128, 0, 0), width, height, top_left, selected_time))
+                            else:
+                                self.time_blocks[selected_time] = [(Block((128, 0, 0), width, height, top_left, selected_time))]
                         self.pos1 = None
                     if self.mode == "lever":
-                        self.interactables.append(Block((0, 50, 110), 24, 24, self.pos1))
+                        self.interactables.append(Block((0, 50, 110), 24, 24, self.pos1, len(self.time_buttons)))
+                        self.time_buttons.append(Button(self.time_buttons[-1].rect.topleft[0] + 32, 0, 32, 32,(50, 100, 120), (50, 50, 50), self.screen_rect, self.time_buttons[-1].option + 1))
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LCTRL:
                         undo = True
                     if event.key == pygame.K_z and undo:
                         if self.mode == "rect":
-                            if len(self.blocks) > 0:
-                                self.blocks.pop()
+                            try:
+                                self.time_blocks[selected_time].pop()
+                            except:
+                                pass
                         elif self.mode == "lever":
                             if len(self.interactables) > 0:
                                 self.interactables.pop()
+                                self.time_buttons.pop()
                     if event.key == pygame.K_l:
                         self.mode = "lever"
                     if event.key == pygame.K_r:
                         self.mode = "rect"
                         self.pos1 = None
+                    if event.key == pygame.K_c:
+                        try:
+                            for block in self.time_blocks[selected_time - 1]:
+                                try:
+                                    self.time_blocks[selected_time].append(block)
+                                except:
+                                    self.time_blocks[selected_time] = [block]
+                        except:
+                            pass
+                        
                 if event.type == pygame.KEYUP:
                     if event == pygame.K_LCTRL:
                         undo = False
@@ -117,6 +145,11 @@ class Map_maker():
             
             for pos in self.line_pos_x:
                 pygame.draw.line(self.screen_rect, (0, 0, 0), pos, (960, pos[1]))
+
+            for button in self.time_buttons:
+                button.draw()
+                if button.is_button_pressed():
+                    selected_time = button.get_option()
 
             self.screen.update()
 
