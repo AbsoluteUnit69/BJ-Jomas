@@ -1,6 +1,7 @@
 import pygame
 from Button import Button
 from Menus import Menu
+from Rounds import Round
 
 class MainGame():
     def __init__(self,screen):
@@ -19,6 +20,11 @@ class MainGame():
 
     
     def mainLoop(self):
+        #
+        map_num = 0
+        total_maps = 5
+        while map_num < total_maps:
+            round = Round(self.screen)
         print("rounds and stuff")
 
 
