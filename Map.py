@@ -90,7 +90,12 @@ class Map_maker():
                                 self.time_blocks[selected_time] = [(Block((128, 0, 0), width, height, top_left, selected_time))]
                         self.pos1 = None
                     if self.mode == "lever":
-                        self.interactables.append(Block((0, 50, 110), 24, 24, self.pos1, len(self.time_buttons)))
+                        temp = Block((0, 50, 110), 24, 24, self.pos1, len(self.time_buttons))
+                        font = pygame.font.SysFont(None, 24)
+                        img = font.render(str(len(self.interactables)), True, (0, 0, 0))
+                        temp.image.blit(img, (7, 5))
+                        self.interactables.append(temp)
+
                         self.time_buttons.append(Button(self.time_buttons[-1].rect.topleft[0] + 32, 0, 32, 32,(50, 100, 120), (50, 50, 50), self.screen_rect, self.time_buttons[-1].option + 1))
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LCTRL:
