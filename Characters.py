@@ -2,7 +2,7 @@ import pygame
 
 class Character(pygame.sprite.Sprite):
     def __init__(self,screen,image):
-        super.__init__()
+        super().__init__()
         self.screen = screen
         self.image = image
         self.rect = self.image.get_rect()
