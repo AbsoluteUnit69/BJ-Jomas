@@ -9,5 +9,5 @@ class Particle:
         self.speed = abs(self.velocity)
         self.acceleration = acceleration
         self.momentum = self.mass * self.speed
-
     
+
