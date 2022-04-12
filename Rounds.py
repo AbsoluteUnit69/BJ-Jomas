@@ -5,8 +5,10 @@ class Round():
         self.screen = screen
         player_image = "nothing"
         self.player = Player(self.screen,[player_image])
+        self.entities = pygame.sprite.Group()
     def mainLoop(self):
-        print("player stuff")
-        print("move the map")
+        pass
+        #check player movements and stuff
+        #-
         #handle groups of players and ghosts
         
