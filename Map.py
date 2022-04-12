@@ -1,3 +1,4 @@
+from email.mime import image
 import pygame
 from Button import Button
 '''
@@ -12,11 +13,24 @@ l for lever mode:
 control z will undo the last block placed in the mode you are in
 
 '''
+class Map(pygame.sprite.Sprite):
+    def __init__(self, timed_platforms, levers):
+        pygame.sprite.Sprite.__init__(self)
+        self.timed_platforms = timed_platforms
+        self.levers = levers
+
+    def getTimedPlatforms(self):
+        return self.timed_platforms
+
+    def getLevers(self):
+        return self.levers
+
 class Block(pygame.sprite.Sprite):
-    def __init__(self, color, width, height, position, time):
+    def __init__(self, image_code, width, height, position, time):
        pygame.sprite.Sprite.__init__(self)
        self.image = pygame.Surface([width, height])
-       self.image.fill(color)
+       self.image.fill(image_code)
+       self.image_code = image_code
        self.rect = self.image.get_rect()
        self.rect.topleft = position
        self.time = time
@@ -25,7 +39,26 @@ class Block(pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.topleft))
 
     def display_grey(self, screen):
-        pygame.draw.rect(screen, (120, 120, 120, 50), self.rect)
+        pygame.draw.rect(screen, (120, 120, 120, 50), self.rect) # remove after map created
+
+class Lever(Block):
+    def __init__(self, color, width, height, position, time):
+        Block.__init__(self, color, width, height, position, time)
+        self.activated = False
+
+    def flick(self):
+        self.activated = not(self.activated)
+
+class Platform(Block):
+    def __init__(self, color, width, height, position, time,  co_friction = 1):
+        Block.__init__(self, color, width, height, position, time)
+        self.co_friction = co_friction
+
+    def getCoFriction(self):
+        return self.co_friction
+
+    def getText(self):
+        text = str(self.image_code) + str(self.rect.width) + str(self.rect.height) + str(self.rect.topleft[0]) + str(self.rect.topleft[1])
         
 class Map_maker():
     def __init__(self):
@@ -61,6 +94,7 @@ class Map_maker():
         self.pos1 = None
         undo = False
         selected_time = 0
+        co_friction = 1
         while run:
 
             self.screen_rect.fill((100, 100, 100))
@@ -85,14 +119,14 @@ class Map_maker():
                     if self.mode == "rect":
                         if width*height > 100:
                             if selected_time in self.time_blocks.keys():
-                                self.time_blocks[selected_time].append(Block((128, 0, 0), width, height, top_left, selected_time))
+                                self.time_blocks[selected_time].append(Platform((128, 0, 0), width, height, top_left, selected_time, co_friction))
                             else:
-                                self.time_blocks[selected_time] = [(Block((128, 0, 0), width, height, top_left, selected_time))]
+                                self.time_blocks[selected_time] = [(Platform((128, 0, 0), width, height, top_left, selected_time, co_friction))]
                         self.pos1 = None
                     if self.mode == "lever":
-                        temp = Block((0, 50, 110), 24, 24, self.pos1, len(self.time_buttons))
+                        temp = Lever((0, 50, 110), 24, 24, self.pos1, len(self.time_buttons))
                         font = pygame.font.SysFont(None, 24)
-                        img = font.render(str(len(self.interactables)), True, (0, 0, 0))
+                        img = font.render(str(len(self.interactables) + 1), True, (0, 0, 0))
                         temp.image.blit(img, (7, 5))
                         self.interactables.append(temp)
 
@@ -100,6 +134,7 @@ class Map_maker():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LCTRL:
                         undo = True
+                        save = True
                     if event.key == pygame.K_z and undo:
                         if self.mode == "rect":
                             try:
@@ -110,6 +145,12 @@ class Map_maker():
                             if len(self.interactables) > 0:
                                 self.interactables.pop()
                                 self.time_buttons.pop()
+                        undo = False
+                        save = False
+                    if event.key == pygame.K_s and save == True:
+                        save = False
+                        undo = False
+                        self.saveMap()
                     if event.key == pygame.K_l:
                         self.mode = "lever"
                     if event.key == pygame.K_r:
@@ -157,5 +198,17 @@ class Map_maker():
                     selected_time = button.get_option()
 
             self.screen.update()
+
+    def saveMap(self):
+        lines = []
+        for time in self.time_blocks:
+            line = []
+            for platform in self.time_blocks[time]:
+                text = platform.getText()
+                line.append(text)
+            lines.append(line)
+        with open("maps.txt", "w") as f:
+            pass
+        f.close
 
 m = Map_maker()
