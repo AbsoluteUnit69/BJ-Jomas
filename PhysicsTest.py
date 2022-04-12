@@ -64,7 +64,7 @@ def main(screen, width, height):
                 break
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                bollock.body.apply_impulse_at_local_point((1000,-12000),(0,0))
+                bollock.body.apply_impulse_at_local_point((4000,-9000),(0,0))
 
         draw(space, screen, draw_options)
         space.step(dt)
