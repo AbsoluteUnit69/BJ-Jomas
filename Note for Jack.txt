@@ -1,0 +1,2 @@
+Hello Jarako. I need these methods from you:
+I give you coords and some information, I want the coords that the object will be in the next frame.
