@@ -15,6 +15,20 @@ def draw(space, screen, draw_options):
     space.debug_draw(draw_options)
     pygame.display.update()
 
+def create_bounds(space, width, height):
+    rects = [
+        [(width/2, height - 10), (width, 20)],
+        [(width/2, 10), (width, 20)],
+        [(10, height/2), (20, height)],
+        [(width - 10, height/2), (20, height)],
+    ]
+
+    for pos, size in rects:
+        body = pymunk.body(body_type=pymunk.Body.STATIC)
+        body.position = pos
+        shape = pymunk.poly.create_box(body, size)
+        space.add(body, shape)
+
 def create_bollock(space, radius, mass):
     body = pymunk.Body()
     body.position = (100,100)
@@ -23,7 +37,6 @@ def create_bollock(space, radius, mass):
     shape.color = (255, 255, 255, 50)
     space.add(body, shape)
     return shape
-
 
 
 
@@ -36,6 +49,7 @@ def main(screen, width, height):
     space.gravity = (0, 981)
 
     bollock = create_bollock(space, 25, 10)
+    create_bounds(space, width, height)
 
     draw_options = pymunk.pygame_util.DrawOptions(screen)
 
