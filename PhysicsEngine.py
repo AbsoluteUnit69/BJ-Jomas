@@ -1,5 +1,8 @@
 from cmath import acos, asin, cos, sin
 import math
+import pygame
+import pymunk
+import pymunk.pygame_util
 from time import time
 
 class Particle:
@@ -14,14 +17,14 @@ class Particle:
         self.angle = angle
 
 
-    def jump(self, velocity, x, y, speed, acceleration, momentum,angle):
+    def jump(self):
         total_time = 1.5
         total_frames = 90
         frame_time = total_time/total_frames
         for i in range(1,total_frames):
             time = frame_time*i
-            self.x = cos(self.angle)*(self.velocity*time)+0.5(acceleration*pow(time,2))
-            self.y = sin(self.angle)*(self.velocity*time)+0.5(acceleration*pow(time,2))
+            self.x = cos(self.angle)*(self.velocity*time)+(self.acceleration*pow(time,2)/2)
+            self.y = sin(self.angle)*(self.velocity*time)+(self.acceleration*pow(time,2)/2)
 
 
     
