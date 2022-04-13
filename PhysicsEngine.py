@@ -2,24 +2,28 @@ from cmath import cos, sin
 import math
 from time import time
 
-class Particle:
-    def __init__(self,mass,velocity,x,y,acceleration,angle):
+class Physics:
+    def __init__(self,mass,velocity,set_speed,x,y,gravity,angle,frictional_constant):
         self.mass =  mass
-        #self.velocity = velocity
         self.velocity = velocity
-        self.x = 0
-        self.y = 0
-        #self.speed = abs(self.velocity)
+        self.set_speed = set_speed
+        self.x = x
+        self.y = y
         self.speed = abs(self.velocity)
-        self.acceleration = acceleration
+        self.gravity = gravity
         self.momentum = self.mass * self.speed
-        #self.angle = angle
+        self.frictional_constant = frictional_constant
         self.angle = angle
         self.displacement = 0
 
     '''
     
 Even though it looks shit it should probably work after ive fixed some small errors
+
+hopefully at least
+
+ignore first two functions just keepin em for a bit to track my progress cus who knows if any of what i have done is right 
+probably not though lmao :'(
 
 '''
     
@@ -37,8 +41,8 @@ Even though it looks shit it should probably work after ive fixed some small err
         y_points = []
         y_spd = self.speed
         while y_spd != 0:
-            x_pos = pow(final_x_vel,2) - pow(initial_x_vel,2) / 2*self.acceleration
-            y_pos = pow(final_y_vel,2) - pow(initial_y_vel,2) / 2*self.acceleration
+            x_pos = pow(final_x_vel,2) - pow(initial_x_vel,2) / 2*self.gravity
+            y_pos = pow(final_y_vel,2) - pow(initial_y_vel,2) / 2*self.gravity
             x_points.append(x_pos)
             y_points.append(y_pos)
             final_x_vel = initial_x_vel
@@ -70,16 +74,16 @@ Even though it looks shit it should probably work after ive fixed some small err
         y_initial_velocity = self.speed*sin(self.angle)
         time_per_frame = total_jump_time / frames
         for i in range(0,frames):
-            y_displacement = y_initial_velocity*time + self.acceleration*time**2
+            y_displacement = y_initial_velocity*time + self.gravity*time**2
             x_distance = x_speed*time
-            y_final_velocity = y_initial_velocity + self.acceleration*time
+            y_final_velocity = y_initial_velocity + self.gravity*time
             y_initial_velocity = y_final_velocity
             time = time + time_per_frame
             self.y = math.trunc(original_y + y_displacement)
             self.x = math.trunc(original_x + x_distance)
             player_pos = (self.x,self.y)
 
-    def newerJump(self):
+    def jump(self):
         original_y = self.y
         original_x = self.x
         x_speed = self.velocity*cos(self.angle)
@@ -88,9 +92,9 @@ Even though it looks shit it should probably work after ive fixed some small err
         time = 0
         not_colliding = True
         while not_colliding:
-            y_displacement = y_initial_velocity*time + self.acceleration*time**2
+            y_displacement = y_initial_velocity*time + self.gravity*time**2
             x_distance = x_speed*time
-            y_final_velocity = y_initial_velocity + self.acceleration*time
+            y_final_velocity = y_initial_velocity + self.gravity*time
             y_initial_velocity = y_final_velocity
             time = time + time_frame
             self.y = math.trunc(original_y + y_displacement)
@@ -98,6 +102,17 @@ Even though it looks shit it should probably work after ive fixed some small err
             player_pos = (self.x,self.y)
             if player_pos == 69:    # need some thing here so if he lands on/hits something it stops but otherwise keeps going e.g. if the player over shoots or undershoots a platform
                 not_colliding = False
+
+    def planes(self):
+        weight = self.mass * self.gravity
+        normal_force = weight
+        friction = self.frictional_constant * normal_force
+        self.velocity = self.set_speed - friction
+
+
+    def inclinedPlanes(self):
+        pass
+
             
 
 
