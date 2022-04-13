@@ -33,7 +33,7 @@ Even though it looks shit it should probably work after ive fixed some small err
         y_points = []
         y_spd = self.speed
 
-        for i in range(1,45):
+        while y_spd != 0:
             x_pos = final_x_vel - initial_x_vel / 2*self.acceleration
             y_pos = final_y_vel - initial_y_vel / 2*self.acceleration
             x_points.append(x_pos)
@@ -43,20 +43,21 @@ Even though it looks shit it should probably work after ive fixed some small err
             initial_x_vel = initial_x_vel - frame_seperation
             initial_x_vel = initial_x_vel - frame_seperation
             y_spd = y_spd - frame_seperation
-            if y_spd == 0:
-                for i in range(1,45):
-                    x_difference = x_points[i] - x_points[i - 1]
-                    y_difference = x_points[i] - x_points[i - 1]
-                    x_pos = x_pos + x_difference
-                    y_pos = y_pos - y_difference
-                    self.x = original_x + x_pos
-                    self.y = original_y + y_pos
-                    player_pos = (math.trunc(self.x),math.trunc(self.y))
-                    return player_pos
             self.x = original_x + x_pos
             self.y = original_y + y_pos
             player_pos = (math.trunc(self.x),math.trunc(self.y))
-            return player_pos
+            print(player_pos)
+
+        for i in range(0,45):
+            x_difference = x_points[45-i] - x_points[45-i+1]
+            y_difference = x_points[i] - x_points[i - 1]
+            x_pos = x_pos + x_difference
+            y_pos = y_pos - y_difference
+            self.x = original_x + x_pos
+            self.y = original_y + y_pos
+            player_pos = (math.trunc(self.x),math.trunc(self.y))
+            print(player_pos)
+
 
 
 
