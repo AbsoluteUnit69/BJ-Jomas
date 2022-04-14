@@ -19,6 +19,7 @@ class Map(pygame.sprite.Sprite):
         self.timed_platforms = timed_platforms
         self.levers = levers
         self.active_time = 0
+        self.activated_levers = []
 
     def getTimedPlatforms(self):
         return self.timed_platforms
@@ -38,8 +39,12 @@ class Map(pygame.sprite.Sprite):
         for lever in self.levers:
             colliding = lever.checkCollide(rect)
             if colliding == True:
-                self.active_time = lever.getTime()
-                lever.flick()
+                if lever.flick():
+                    self.activated_levers.append(lever.getTime())
+                    self.active_time = lever.getTime()
+                else:
+                    self.activated_levers.remove(lever.getTime())
+                    self.active_time = self.activated_levers[-1]
                 return True
 
 class Block(pygame.sprite.Sprite):
@@ -75,6 +80,7 @@ class Lever(Block):
 
     def flick(self):
         self.activated = not(self.activated)
+        return self.activated
 
 class Platform(Block):
     def __init__(self, image_code, width, height, position, time,  co_friction = 1):
