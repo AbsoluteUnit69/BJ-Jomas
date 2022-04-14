@@ -18,12 +18,29 @@ class Map(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.timed_platforms = timed_platforms
         self.levers = levers
+        self.active_time = 0
 
     def getTimedPlatforms(self):
         return self.timed_platforms
 
     def getLevers(self):
         return self.levers
+    
+    def checkCollisions(self, rect):
+        colliding = False
+        for platform in self.timed_platforms[self.active_time]:
+            colliding = platform.checkCollide(rect)
+            if colliding == True:
+                return True
+
+    def checkInteractions(self, rect):
+        colliding = False
+        for lever in self.levers:
+            colliding = lever.checkCollide(rect)
+            if colliding == True:
+                self.active_time = lever.getTime()
+                lever.flick()
+                return True
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, image_code, width, height, position, time):
@@ -41,6 +58,12 @@ class Block(pygame.sprite.Sprite):
     def getText(self):
         text = str(self.image_code) + "." + str(self.rect.width) + "." + str(self.rect.height) + "." + str(self.rect.topleft[0]) + "." + str(self.rect.topleft[1]) + "." + str(self.time)
         return text
+
+    def checkCollide(self, rect):
+        return self.rect.colliderect(rect)
+
+    def getTime(self):
+        return self.time
 
     def display_grey(self, screen):
         pygame.draw.rect(screen, (120, 120, 120, 50), self.rect) # remove after map created
@@ -103,7 +126,7 @@ class Map_maker():
         while run:
 
             self.screen_rect.fill((100, 100, 100))
-            for time in self.time_blocks.keys():
+            for time in self.time_blocks:
                 if time == selected_time:
                     for block in self.time_blocks[time]:
                         block.display(self.screen_rect)
@@ -214,7 +237,6 @@ class Map_maker():
                 text = platform.getText()
                 line.append(text)
             lines.append(line)
-        print(lines)
         lines2 = []
         for lever in self.interactables:
             text = lever.getText()
@@ -247,10 +269,10 @@ def loadMaps():
                 for j in range(0, len(temp)):
                     temp[j] = temp[j].strip(" ")
                 code = (int(temp[0]), int(temp[1]), int(temp[2]))
-                if not platform[5] in platforms:
-                    platforms[platform[5]] = [Platform(code, int(platform[1]), int(platform[2]), (int(platform[3]), int(platform[4])), int(platform[5]), int(platform[6]))]
+                if not int(platform[5]) in platforms:
+                    platforms[int(platform[5])] = [Platform(code, int(platform[1]), int(platform[2]), (int(platform[3]), int(platform[4])), int(platform[5]), int(platform[6]))]
                 else:
-                    platforms[platform[5]].append(Platform(code, int(platform[1]), int(platform[2]), (int(platform[3]), int(platform[4])), int(platform[5]), int(platform[6])))
+                    platforms[int(platform[5])].append(Platform(code, int(platform[1]), int(platform[2]), (int(platform[3]), int(platform[4])), int(platform[5]), int(platform[6])))
 
             lines[i+1] = lines[i+1].strip("\n")
             lever_info = lines[i+1].split("&")
@@ -261,10 +283,40 @@ def loadMaps():
                 for j in range(0, len(temp)):
                     temp[j] = temp[j].strip(" ")
                 code = (int(temp[0]), int(temp[1]), int(temp[2]))
-                levers.append(Lever(code, int(platform[1]), int(platform[2]), (int(platform[3]), int(platform[4])), int(platform[5])))
+                levers.append(Lever(code, int(lever[1]), int(lever[2]), (int(lever[3]), int(lever[4])), int(lever[5])))
 
             maps.append(Map(platforms, levers))
-            return maps
+        return maps
 m = Map_maker()
 
+
+
 maps = loadMaps()
+
+screen = pygame.display
+screen_rect = screen.set_mode((960, 540))
+
+index = 0
+run = True
+selected_time = 0
+while run:
+    screen_rect.fill((100, 100, 100))
+    for block in maps[index].timed_platforms[selected_time]:
+        block.display(screen_rect)
+    for lever in maps[index].levers:
+        lever.display(screen_rect)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_n:
+                index += 1
+                selected_time = 0
+                if index == len(maps):
+                    index = 0
+            if event.key == pygame.K_m:
+                selected_time += 1
+                if selected_time == len(maps[index].timed_platforms.keys()):
+                    selected_time = 0
+    screen.update()
