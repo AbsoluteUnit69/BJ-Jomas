@@ -16,7 +16,7 @@ class Round():
         pass    
     def mainLoop(self):
         self.screen.fill((0,0,0))
-        self.map.output()
+        self.map.display(self.screen)
         self.entities.update(self.map)
         self.handlePlayerActions()
         #check player movements and stuff
@@ -55,5 +55,5 @@ class Round():
             self.map.setBoostLocation()
             self.handleAnimation()
     def handleAnimation(self):
-        pass #leave to freddie - he loves this kinda thing
+        pass #leave to freddie - he loves this kinda thing          no i dont
         
