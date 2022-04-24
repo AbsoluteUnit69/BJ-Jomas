@@ -21,6 +21,15 @@ class Map(pygame.sprite.Sprite):
         self.active_time = 0
         self.activated_levers = []
 
+    def getMapState(self):
+        return self.active_time
+
+    def display(self, screen_rect):
+        for block in maps[index].timed_platforms[selected_time]:
+            block.display(screen_rect)
+        for lever in maps[index].levers:
+            lever.display(screen_rect)
+
     def getTimedPlatforms(self):
         return self.timed_platforms
 
