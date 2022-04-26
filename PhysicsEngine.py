@@ -5,8 +5,8 @@ from time import time
 class Physics:
     def __init__(self,mass,velocity,set_speed,x,y,gravity,angle,frictional_constant):
         self.mass =  mass
-        self.velocity = velocity
-        self.set_speed = set_speed
+        self.x_velocity = x_velocity
+        self.y_velocity = y_velocity
         self.x = x
         self.y = y
         self.speed = abs(self.velocity)
@@ -15,6 +15,8 @@ class Physics:
         self.frictional_constant = frictional_constant
         self.angle = angle
         self.displacement = 0
+        time_frame = 0.1
+        time = 0
 
     '''
     
@@ -103,11 +105,24 @@ probably not though lmao :'(
             if player_pos == 69:    # need some thing here so if he lands on/hits something it stops but otherwise keeps going e.g. if the player over shoots or undershoots a platform
                 not_colliding = False
 
+    def finalJump(self):
+        original_y = self.y
+        original_x = self.x
+        y_displacement = y_initial_velocity*time + self.gravity*time**2
+        x_distance = x_velocity*time
+        y_final_velocity = y_initial_velocity + self.gravity*time
+        y_initial_velocity = y_final_velocity
+        time = time + time_frame
+        self.y = math.trunc(original_y + y_displacement)
+        self.x = math.trunc(original_x + x_distance)
+        player_pos = (self.x,self.y)
+        return player_pos, time, y_initial_velocity
+
     def planes(self):
         weight = self.mass * self.gravity
         normal_force = weight
         friction = self.frictional_constant * normal_force
-        self.velocity = self.set_speed - friction
+        self.velocity = self.x_velocity - friction
 
 
     def inclinedPlanes(self):
