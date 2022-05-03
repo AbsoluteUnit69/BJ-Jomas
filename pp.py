@@ -50,6 +50,7 @@ class Physics:
         
         if final_y_velocity < self.terminal_velocity:
             final_y_velocity = self.terminal_velocity
+            print("Terminal Velocity Reached")
         self.y_velocity = final_y_velocity
             
         self.y_displacement = self.y_velocity*self.time - (1/2)*a*self.time**2
@@ -70,10 +71,10 @@ class Physics:
             
         x_forces = friction + x_driving_force
 
-        print(x_driving_force, -friction)
+        #print(x_driving_force, -friction)
         
         a = x_forces/self.mass
-        print(a, x_forces, "hello")
+        #print(a, x_forces, "hello")
         
         final_x_velocity = self.x_velocity + a*self.time
         
@@ -82,7 +83,7 @@ class Physics:
         elif final_x_velocity < -self.max_speed:
             final_x_velocity = -self.max_speed
 
-        print(self.x_velocity, final_x_velocity)
+        #print(self.x_velocity, final_x_velocity)
 
         if x_driving_force == 0:
             if self.x_velocity < 0 and final_x_velocity > 0:
@@ -107,7 +108,8 @@ class Game:
         self.floor_co_efficient = 0.55
         self.mass = 65
         self.man = pygame.Rect(0, 0, 50, 100)
-        self.terminal_velocity = -math.sqrt((2*self.mass*9.81)/(1000*0.05*(self.man.width*0.0001)))
+        self.terminal_velocity = -math.sqrt((2*self.mass*9.81)/(1000*0.1*0.12))
+        print("Terminal Velocity = ", self.terminal_velocity," m/s and", (self.terminal_velocity*62)," pixels")
         self.extended_man = pygame.Rect(0, 0, 50, 1)
         self.extended_man.topleft = self.man.bottomleft
         self.max_speed = 0
@@ -144,7 +146,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     run = False
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:# and self.on_rect:
+                    if event.key == pygame.K_SPACE: #and self.on_rect:
                         self.y_driving_force = JUMP_FORCE
                         print("please stop ignore\n\n\n\n\n\n\n\n\n\n\n")
                         

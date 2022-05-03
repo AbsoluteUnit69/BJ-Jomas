@@ -168,4 +168,3 @@ class Game:
 
 g = Game()
 g.display()
-        
