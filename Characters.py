@@ -1,5 +1,5 @@
 import pygame
-from PhysicsEngine import Particle
+from pp import *
 
 class Character(pygame.sprite.Sprite):
     def __init__(self,screen,image):
@@ -28,12 +28,15 @@ class Player(Character):
         self.saved_actions = []
         self.max_cycles = 5
     def findNextPos(self,map):
-        next_coords = PhysicsEngine.SomeMethod()
+        returned_data = Physics.planes(self.physics,self.x_drving_force,self.y_driving_force,self.on_rect)#[(self.x + (self.x_displacement*100), self.y - (self.y_displacement*100)), self.x_velocity, self.y_velocity]
+        next_coords = (returned_data[0],returned_data[1])
         temp_rect = self.image.get_rect()
         temp_rect.center = next_coords
         collision = map.checkCollisions(temp_rect)
         if not collision:
             self.rect.center = next_coords
+            self.x_velocity = returned_data[2]
+            self.y_velocity = returned_data[3]
 
     def movement(self,map):
         JUMP_SPEED = 3
@@ -50,17 +53,17 @@ class Player(Character):
             self.vertical_speed = JUMP_SPEED
             self.vertical_accel = -9.81
 
-        self.driving_force = 0
+        self.x_driving_force = 0
         if key[pygame.K_d]:#moving right
             if sprint:
-                self.driving_force += SPRINT_SPEED
+                self.x_driving_force += SPRINT_SPEED
             else:
-                self.driving_force += MOVE_SPEED     
+                self.x_driving_force += MOVE_SPEED     
         if key[pygame.k_a]:#moving left
             if sprint:
-                self.driving_force -= SPRINT_SPEED
+                self.x_driving_force -= SPRINT_SPEED
             else:
-                self.driving_force -= MOVE_SPEED
+                self.x_driving_force -= MOVE_SPEED
 
         self.findNextPos(map)
     def interactions(self,map):
